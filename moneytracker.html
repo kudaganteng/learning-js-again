@@ -25,7 +25,7 @@
         </select>
         <input type="text" id="transaction" placeholder="Masukkan jumlah transaksi">
         <textarea name="transactionInfo" id="transactionInfo" placeholder="Masukkan informasi transaksi"></textarea>
-        <button id="submitTransaction">Masukkan transaksi</button>
+        <button id="submitTransaction">👌👌</button>
     </div>
     <hr>
     <span>Filter: </span><Select name="transactionTypeTab" id="transactionTypeTab">
@@ -48,6 +48,8 @@
     let categorySelect = document.getElementById('transactionCategory')
     let transactionTypeTab = document.getElementById('transactionTypeTab')
     let transactionCatTab = document.getElementById('transactionCatTab')
+
+    let editId = null
 
     const savedData = localStorage.getItem('MY_TRANSACTIONS')
 
@@ -121,7 +123,8 @@
         const htmllist = filteredList.map((item) => {
             return `<div class="transaction-item">
                 <span><b>${item.transactionType}</b>: Rp.${item.transaction} untuk ${item.transactionInfo}</span>
-                <button class="btn-hapus" onclick="deleteTransaction(${item.transactionId})">Hapus</button>
+                <button class="btn-hapus" onclick="deleteTransaction(${item.transactionId})">❌</button>
+                <button class="btn-edit" onclick="editTransaction(${item.transactionId})">📝</button>
               </div>`
         })
         transactionArea.innerHTML = htmllist.join("")
@@ -129,6 +132,22 @@
         const totalIncome = transactionList.filter(t => t.transactionType === "income").reduce((sum, data) => sum + data.transaction, 0)
         let totalOutcome = transactionList.filter(t => t.transactionType === "outcome").reduce((sum, data) => sum + data.transaction, 0)
         cardArea.innerHTML = `<h3>Pemasukan: ${totalIncome}</h3><h3>Pengeluaran: ${totalOutcome}</h3><h3>Tersedia sekarang: ${totalIncome - totalOutcome}`
+    }
+
+    const editTransaction = (id) => {
+        const target = transactionList.find(item => item.transactionId === id)
+
+        if (target) {
+            editId = id
+            document.getElementById('transactionType').value = target.transactionType
+            document.getElementById('transaction').value = target.transaction
+            document.getElementById('transactionInfo').value = target.transactionInfo
+            
+            updateCategory()
+            document.getElementById('transactionCategory').value = target.transactionCategory
+
+            document.getElementById('submitTransaction').innerText = "Simpan Perubahan"
+        }
     }
 
     const updateTranscationCat = () => {
@@ -175,8 +194,25 @@
         transacInfoValue = document.getElementById('transactionInfo').value
 
         if (transacTypeValue && transacCategory && !isNaN(transacValue) && transacInfoValue) {
-            transactionList.push({ transactionId: Date.now(), transactionType: transacTypeValue, transactionCategory: transacCategory, transaction: transacValue, transactionInfo: transacInfoValue })
+            if (editId) {
+                transactionList = transactionList.map(item => {
+                    if (item.transactionId === editId) {
+                        return {...item, transactionId: Date.now(), transactionType: transacTypeValue, transactionCategory: transacCategory, transaction: transacValue, transactionInfo: transacInfoValue }
+                    }
+                    return item
+                })
+
+                editId = null
+                document.getElementById('submitTransaction').innerText = "👌👌"
+            }
+
+            else{
+                transactionList.push({ transactionId: Date.now(), transactionType: transacTypeValue, transactionCategory: transacCategory, transaction: transacValue, transactionInfo: transacInfoValue })
+            }
             render()
+
+            document.getElementById("transaction").value = ""
+            document.getElementById("transactionInfo").value = ""
         }
         else {
             alert("Transaksi tidak sah (masukkan angka yang benar)")
