@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money tracker</title>
+</head>
+
+<body>
+    <h1>Money Tracker</h1>
+    <hr>
+
+    <div id="cardArea">
+
+    </div>
+    <hr>
+    <div id="inputArea">
+        <select name="transactionType" id="transactionType" onchange="updateCategory()">
+            <option value="outcome">Pengeluaran</option>
+            <option value="income">Pemasukan</option>
+        </select>
+        <select name="transactionCategory" id="transactionCategory">
+            <option value="default">Pilih kategori transaksi</option>
+        </select>
+        <input type="text" id="transaction" placeholder="Masukkan jumlah transaksi">
+        <textarea name="transactionInfo" id="transactionInfo" placeholder="Masukkan informasi transaksi"></textarea>
+        <button id="submitTransaction">Masukkan transaksi</button>
+    </div>
+    <hr>
+    <span>Filter: </span><Select name="transactionTypeTab" id="transactionTypeTab">
+        <option value="default">Semua Transaksi</option>
+        <option value="income">Pemasukan</option>
+        <option value="outcome">Pengeluaran</option>
+    </Select>
+    <Select name="transactionCatTab" id="transactionCatTab">
+
+    </Select>
+
+    <div id="transactionList">
+
+    </div>
+</body>
+<script>
+    let transactionArea = document.getElementById('transactionList')
+    let cardArea = document.getElementById('cardArea')
+    let typeSelect = document.getElementById('transactionType')
+    let categorySelect = document.getElementById('transactionCategory')
+    let transactionTypeTab = document.getElementById('transactionTypeTab')
+    let transactionCatTab = document.getElementById('transactionCatTab')
+
+    const savedData = localStorage.getItem('MY_TRANSACTIONS')
+
+    const categoryMapInput = {
+        outcome: ["Makanan", "Transport", "Hiburan", "Tagihan"],
+        income: ["Gaji", "Bonus", "Investasi", "Hadiah"]
+    }
+    const categoryMapList = {
+        default: ["Semua Jenis"],
+        outcome: ["Semua Jenis", "Makanan", "Transport", "Hiburan", "Tagihan"],
+        income: ["Semua Jenis", "Gaji", "Bonus", "Investasi", "Hadiah"]
+    }
+    let transactionList = savedData ? JSON.parse(savedData) : [{
+        transactionId: 1,
+        transactionType: 'outcome',
+        transactionCategory: 'Transport',
+        transaction: 12000,
+        transactionInfo: 'Beli bensin'
+    },
+    {
+        transactionId: 2,
+        transactionType: 'income',
+        transactionCategory: 'Gaji',
+        transaction: 1000000,
+        transactionInfo: 'Gaji'
+    },
+    {
+        transactionId: 3,
+        transactionType: 'outcome',
+        transactionCategory: 'Tagihan',
+        transaction: 200000,
+        transactionInfo: 'bayar Wifi'
+    }, {
+        transactionId: 4,
+        transactionType: 'income',
+        transactionCategory: 'Investasi',
+        transaction: 1000000,
+        transactionInfo: 'BBCA'
+    },
+    {
+        transactionId: 5,
+        transactionType: 'income',
+        transactionCategory: 'Hadiah',
+        transaction: 100000,
+        transactionInfo: 'Gaji'
+    },
+    {
+        transactionId: 6,
+        transactionType: 'outcome',
+        transactionCategory: 'Hiburan',
+        transaction: 500000,
+        transactionInfo: 'bayar Wifi'
+    },
+
+
+    ]
+
+    const render = () => {
+        localStorage.setItem('MY_TRANSACTIONS', JSON.stringify(transactionList))
+        const filteredList = transactionList.filter((item) => {
+            if (transactionTypeTab.value === "default") {
+                return true;
+            }
+            return item.transactionType === transactionTypeTab.value
+        }).filter((cat) => {
+            if (transactionCatTab.value === "Semua Jenis") {
+                return true;
+            }
+            return cat.transactionCategory === transactionCatTab.value
+        })
+        const htmllist = filteredList.map((item) => {
+            return `<div class="transaction-item">
+                <span><b>${item.transactionType}</b>: Rp.${item.transaction} untuk ${item.transactionInfo}</span>
+                <button class="btn-hapus" onclick="deleteTransaction(${item.transactionId})">Hapus</button>
+              </div>`
+        })
+        transactionArea.innerHTML = htmllist.join("")
+
+        const totalIncome = transactionList.filter(t => t.transactionType === "income").reduce((sum, data) => sum + data.transaction, 0)
+        let totalOutcome = transactionList.filter(t => t.transactionType === "outcome").reduce((sum, data) => sum + data.transaction, 0)
+        cardArea.innerHTML = `<h3>Pemasukan: ${totalIncome}</h3><h3>Pengeluaran: ${totalOutcome}</h3><h3>Tersedia sekarang: ${totalIncome - totalOutcome}`
+    }
+
+    const updateTranscationCat = () => {
+        const selectedType = transactionTypeTab.value
+        const availCategory = categoryMapList[selectedType]
+
+        if (selectedType === "default") {
+            transactionCatTab.disabled = true
+        } else {
+            transactionCatTab.disabled = false
+        }
+
+        const optionsHTML = availCategory.map((cat) => {
+            return `<option value="${cat}">${cat}</option>`
+        }).join("")
+
+        transactionCatTab.innerHTML = optionsHTML
+    }
+
+    const updateCategory = () => {
+        const selectedType = typeSelect.value
+        const availCategory = categoryMapInput[selectedType]
+
+        const optionsHTML = availCategory.map((cat) => {
+            return `<option value="${cat}">${cat}</option>`
+        }).join("")
+
+        categorySelect.innerHTML = optionsHTML
+    }
+
+    transactionTypeTab.addEventListener('change', () => {
+        render()
+        updateTranscationCat()
+    })
+
+    transactionCatTab.addEventListener('change', () => {
+        render()
+    })
+
+    document.getElementById('submitTransaction').addEventListener('click', () => {
+        transacTypeValue = document.getElementById('transactionType').value
+        transacCategory = document.getElementById('transactionCategory').value
+        transacValue = parseInt(document.getElementById('transaction').value)
+        transacInfoValue = document.getElementById('transactionInfo').value
+
+        if (transacTypeValue && transacCategory && !isNaN(transacValue) && transacInfoValue) {
+            transactionList.push({ transactionId: Date.now(), transactionType: transacTypeValue, transactionCategory: transacCategory, transaction: transacValue, transactionInfo: transacInfoValue })
+            render()
+        }
+        else {
+            alert("Transaksi tidak sah (masukkan angka yang benar)")
+        }
+
+    })
+
+    function deleteTransaction(id) {
+        transactionList = transactionList.filter(item => item.transactionId !== id)
+        render()
+    }
+    updateCategory()
+    updateTranscationCat()
+    render()
+</script>
+
+</html>

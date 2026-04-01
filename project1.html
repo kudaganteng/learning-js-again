@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        h1 {
+            color: black;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #counter {
+            color: blueviolet;
+            text-align: center;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            font-size: 200px;
+        }
+
+        button {
+            padding: 20px 50px;
+
+
+        }
+
+        #buttonArea {
+            justify-content: center;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="name"></h1>
+    <div id="counter"></div>
+    <div id="buttonArea">
+        <button id="increase" onclick="increase()">+</button>
+        <button id="decrease" onclick="decrease()">-</button>
+
+    </div>
+</body>
+<script>
+    let count = 0
+    let name = "Adin"
+
+    const render = () => {
+        document.getElementById("name").innerHTML = "Halo " + name
+        document.getElementById("counter").innerHTML = count
+
+        if (count > 0) {
+            document.getElementById("decrease").disabled = false;
+        }
+        else{
+            document.getElementById("decrease").disabled = true;
+        }
+    }
+
+
+    const increase = () => {
+        count = count + 1
+        render()
+    }
+
+    const decrease = () => {
+        count = count - 1
+        render()
+    }
+
+
+
+    render()
+</script>
+
+</html>

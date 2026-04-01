@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kalkulator MBG</title>
+    <style>
+        body {
+            background-color: bisque;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: monospace;
+        }
+
+        #subText {
+            font-family: monospace;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        hr {
+            width: 50%;
+            border: 2px solid goldenrod;
+        }
+
+        #main {
+            display: grid;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #kotakInput {
+            border: 2px solid whitesmoke;
+            padding: 20px;
+        }
+        #root{
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Kalkulator MBG</h1>
+    <div id="subText">1 hari MBG = 1.200.000.000.000</div>
+    <hr>
+    <div id="main">
+        <div id="kotakInput">
+            <input type="text" id="hargaBenda" placeholder="setara berapa hari MBG ya?">
+        </div>
+        <div id="root"></div>
+    </div>
+</body>
+<script>
+    let sehariMBG = 1200000000000
+    let hargaBenda = 0
+    let berapaHariMBG = 0
+
+    const hasilHitungan = () => {
+        return `<div style="border: 1px green;"><p>setara dengan <b>${berapaHariMBG}</b> hari MBG</p></div>`
+    }
+
+    const render = () => {
+        const root = document.getElementById('root')
+        root.innerHTML = hasilHitungan()
+    }
+
+    document.getElementById('hargaBenda').addEventListener('input', (e) => {
+        hargaBenda = e.target.value
+        berapaHariMBG = hargaBenda / sehariMBG
+        render()
+    })
+
+    render()
+</script>
+
+</html>

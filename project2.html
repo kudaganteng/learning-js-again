@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" id="inputNama" placeholder="Masukkan nama anda...">
+    <button id="btnTambah">Tambah Umur</button>
+    <hr>
+    <div id="root">
+
+    </div>    
+</body>
+<script>
+    let dataKita = {
+        nama: 'agus',
+        umur: 20
+    }
+
+    const tampilKartu = () =>{
+        return `<div style="border: 2px solid blue; padding: 10px; width: 200px;">
+          <h3>Halo, ${dataKita.nama}!</h3>
+          <p>Umur kamu: <b>${dataKita.umur}</b> tahun</p>
+        </div>`
+    }
+
+    const render = () => {
+        const root = document.getElementById('root');
+        root.innerHTML = tampilKartu()
+    }
+
+    document.getElementById('inputNama').addEventListener('input', (e) => {
+        dataKita.nama = e.target.value
+        render()
+    })
+
+    document.getElementById('btnTambah').addEventListener('click', () => {
+        dataKita.umur = dataKita.umur + 1
+        render()
+    })
+
+    render()
+
+
+</script>
+</html>

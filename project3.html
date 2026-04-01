@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Kasir</h1>
+    <input type="text" id="namaBarang" placeholder="Masukin nama barang">
+    <input type="text" id="hargaBarang" placeholder="Masukin harga barang">
+    <button id="tambahKeranjang">Masukkan ke keranjang</button>
+    <hr>
+    <h3>Keranjang Belanjaan</h3>
+    <ul id="keranjangBelanja">
+
+    </ul>
+    <hr>
+    <h4>total belanja anda <span id="totalBelanja"></span></h4>
+</body>
+<script>
+    let dataBelanja = [{
+        idBarang: 1,
+        namaBarang: 'Kopi',
+        hargaBarang: 12000,
+    },
+    {
+        idBarang: 2,
+        namaBarang: 'Teh',
+        hargaBarang: 10000,
+    }
+    ]
+
+    const render = () => {
+        const listBelanjaUI = document.getElementById('keranjangBelanja')
+        const totalBelanjaUI = document.getElementById('totalBelanja')
+
+        const tampilanHTML = dataBelanja.map((barang) => {
+            return `
+                <li>
+                    ${barang.namaBarang} - Rp${barang.hargaBarang}
+                    <button onClick='hapusBarang(${barang.idBarang})'>Hapus</button>
+                </li>
+                    `
+        })
+
+        listBelanjaUI.innerHTML = tampilanHTML.join("")
+
+        const total = dataBelanja.reduce((jumlah, barang) => jumlah + barang.hargaBarang, 0)
+        totalBelanjaUI.innerHTML = total
+    }
+
+    document.getElementById('tambahKeranjang').addEventListener('click', (e) => {
+        const nama = document.getElementById('namaBarang').value
+        const harga = document.getElementById('hargaBarang').value
+
+        if (nama && harga) {
+            dataBelanja.push({id: Date.now(), namaBarang: nama, hargaBarang: harga})
+            render()
+        }
+    })
+
+    const hapusBarang = (id) => {
+        dataBelanja = dataBelanja.filter(barang => barang.idBarang !== id)
+        render()
+    }
+    render()
+</script>
+
+</html>
