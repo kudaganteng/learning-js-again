@@ -29,6 +29,12 @@
         <button id="cancelEdit" hidden>Cancel edit</button>
     </div>
     <hr>
+     <span>Urutkan: </span><select name="sortType" id="sortType">
+        <option value="newest">Terbaru</option>
+        <option value="oldest">Terlama</option>
+        <option value="highest">Terbesar</option>
+        <option value="lowest">Terkecil</option>
+    </select>
     <span>Filter: </span><Select name="transactionTypeTab" id="transactionTypeTab">
         <option value="default">Semua Transaksi</option>
         <option value="income">Pemasukan</option>
@@ -37,13 +43,6 @@
     <Select name="transactionCatTab" id="transactionCatTab">
 
     </Select>
-
-    <span>Urutkan: </span><select name="sortType" id="sortType">
-        <option value="oldest">Terlama</option>
-        <option value="newest">Terbaru</option>
-        <option value="highest">Terbesar</option>
-        <option value="lowest">Terkecil</option>
-    </select>
 
     <div id="transactionList">
 
@@ -56,7 +55,7 @@
     let categorySelect = document.getElementById('transactionCategory')
     let transactionTypeTab = document.getElementById('transactionTypeTab')
     let transactionCatTab = document.getElementById('transactionCatTab')
-    let sortValue = document.getElementsById('sortType')
+    let sortValue = document.getElementById('sortType')
 
     let editId = null
 
@@ -131,14 +130,14 @@
         })
         
         filteredList.sort((a,b) => {
-            if (sortValue.value === "oldest") {
-                return a.transactionId-b.transactionId
-            }else if(sortValue.value === "newest"){
+            if (sortValue.value === "newest") {
                 return b.transactionId-a.transactionId
+            }else if(sortValue.value === "oldest"){
+                return a.transactionId-b.transactionId
             }else if(sortValue.value === "highest"){
-                return a.transaction-b.transaction
-            }else if (sortValue.value === "lowest") {
                 return b.transaction-a.transaction
+            }else if (sortValue.value === "lowest") {
+                return a.transaction-b.transaction
             }
         })
 
