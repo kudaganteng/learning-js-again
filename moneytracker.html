@@ -25,7 +25,8 @@
         </select>
         <input type="text" id="transaction" placeholder="Masukkan jumlah transaksi">
         <textarea name="transactionInfo" id="transactionInfo" placeholder="Masukkan informasi transaksi"></textarea>
-        <button id="submitTransaction">👌👌</button>
+        <button id="submitTransaction">Submit</button>
+        <button id="cancelEdit" hidden>Cancel edit</button>
     </div>
     <hr>
     <span>Filter: </span><Select name="transactionTypeTab" id="transactionTypeTab">
@@ -36,6 +37,13 @@
     <Select name="transactionCatTab" id="transactionCatTab">
 
     </Select>
+
+    <span>Urutkan: </span><select name="sortType" id="sortType">
+        <option value="oldest">Terlama</option>
+        <option value="newest">Terbaru</option>
+        <option value="highest">Terbesar</option>
+        <option value="lowest">Terkecil</option>
+    </select>
 
     <div id="transactionList">
 
@@ -48,6 +56,7 @@
     let categorySelect = document.getElementById('transactionCategory')
     let transactionTypeTab = document.getElementById('transactionTypeTab')
     let transactionCatTab = document.getElementById('transactionCatTab')
+    let sortValue = document.getElementsById('sortType')
 
     let editId = null
 
@@ -120,6 +129,19 @@
             }
             return cat.transactionCategory === transactionCatTab.value
         })
+        
+        filteredList.sort((a,b) => {
+            if (sortValue.value === "oldest") {
+                return a.transactionId-b.transactionId
+            }else if(sortValue.value === "newest"){
+                return b.transactionId-a.transactionId
+            }else if(sortValue.value === "highest"){
+                return a.transaction-b.transaction
+            }else if (sortValue.value === "lowest") {
+                return b.transaction-a.transaction
+            }
+        })
+
         const htmllist = filteredList.map((item) => {
             return `<div class="transaction-item">
                 <span><b>${item.transactionType}</b>: Rp.${item.transaction} untuk ${item.transactionInfo}</span>
@@ -142,11 +164,12 @@
             document.getElementById('transactionType').value = target.transactionType
             document.getElementById('transaction').value = target.transaction
             document.getElementById('transactionInfo').value = target.transactionInfo
-            
+
             updateCategory()
             document.getElementById('transactionCategory').value = target.transactionCategory
 
             document.getElementById('submitTransaction').innerText = "Simpan Perubahan"
+            document.getElementById('cancelEdit').hidden = false
         }
     }
 
@@ -187,6 +210,18 @@
         render()
     })
 
+    sortValue.addEventListener('change', () => {
+        render()
+    })
+
+    document.getElementById('cancelEdit').addEventListener('click', () => {
+        editId = null
+        document.getElementById('transaction').value = ""
+        document.getElementById('transactionInfo').value = ""
+        document.getElementById('submitTransaction').innerText = "Simpan Perubahan"
+        document.getElementById('cancelEdit').hidden = true
+    })
+
     document.getElementById('submitTransaction').addEventListener('click', () => {
         transacTypeValue = document.getElementById('transactionType').value
         transacCategory = document.getElementById('transactionCategory').value
@@ -197,7 +232,7 @@
             if (editId) {
                 transactionList = transactionList.map(item => {
                     if (item.transactionId === editId) {
-                        return {...item, transactionId: Date.now(), transactionType: transacTypeValue, transactionCategory: transacCategory, transaction: transacValue, transactionInfo: transacInfoValue }
+                        return { ...item, transactionId: Date.now(), transactionType: transacTypeValue, transactionCategory: transacCategory, transaction: transacValue, transactionInfo: transacInfoValue }
                     }
                     return item
                 })
@@ -206,7 +241,7 @@
                 document.getElementById('submitTransaction').innerText = "👌👌"
             }
 
-            else{
+            else {
                 transactionList.push({ transactionId: Date.now(), transactionType: transacTypeValue, transactionCategory: transacCategory, transaction: transacValue, transactionInfo: transacInfoValue })
             }
             render()
