@@ -142,8 +142,9 @@
         })
 
         const htmllist = filteredList.map((item) => {
+            const savedTimestamp = item.transactionId
             return `<div class="transaction-item">
-                <span><b>${item.transactionType}</b>: Rp.${item.transaction} untuk ${item.transactionInfo}</span>
+                <span>${new Date(savedTimestamp).toDateString()}: <b>${item.transactionType}</b>: Rp.${item.transaction} untuk ${item.transactionInfo}</span>
                 <button class="btn-hapus" onclick="deleteTransaction(${item.transactionId})">❌</button>
                 <button class="btn-edit" onclick="editTransaction(${item.transactionId})">📝</button>
               </div>`
