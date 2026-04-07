@@ -12,8 +12,19 @@
     <hr>
 
     <div id="cardArea">
-
+        <h3>Total pemasukan: <span id="pemasukanShowArea"></span></h3>
+        <h3>Total pengeluaran: <span id="pengeluaranShowArea"></span></h3>
+        <h3>Sisa di dompet: <span id="sisaShowArea"></span></h3>
     </div>
+    <hr>
+        <span>Filter total berdasarkan :</span><Select name="totalTypeTab" id="totalTypeTab" onchange="updateTotalCat()"> 
+        <option value="income">Pemasukan</option>
+        <option value="outcome">Pengeluaran</option>
+    </Select>
+    <Select name="totalCatTab" id="totalCatTab">
+
+    </Select>
+    <h4 id="totalFilterShow"></h4>
     <hr>
     <div id="inputArea">
         <select name="transactionType" id="transactionType" onchange="updateCategory()">
@@ -50,16 +61,22 @@
     </div>
 </body>
 <script>
-    let transactionArea = document.getElementById('transactionList')
-    let cardArea = document.getElementById('cardArea')
-    let typeSelect = document.getElementById('transactionType')
-    let categorySelect = document.getElementById('transactionCategory')
-    let transactionTypeTab = document.getElementById('transactionTypeTab')
-    let transactionCatTab = document.getElementById('transactionCatTab')
-    let sortValue = document.getElementById('sortType')
-    let monthFilter = document.getElementById('filterMonth')
-    let resetFilter = document.getElementById('resetFilter')
-
+    const transactionArea = document.getElementById('transactionList')
+    const cardArea = document.getElementById('cardArea')
+    const typeSelect = document.getElementById('transactionType')
+    const categorySelect = document.getElementById('transactionCategory')
+    const transactionTypeTab = document.getElementById('transactionTypeTab')
+    const transactionCatTab = document.getElementById('transactionCatTab')
+    const sortValue = document.getElementById('sortType')
+    const monthFilter = document.getElementById('filterMonth')
+    const resetFilter = document.getElementById('resetFilter')
+    const pemasukanShowArea = document.getElementById('pemasukanShowArea')
+    const pengeluaranShowArea = document.getElementById('pengeluaranShowArea')
+    const sisaShowArea = document.getElementById('sisaShowArea')
+    const totalTypeTab = document.getElementById('totalTypeTab')
+    const totalCatTab = document.getElementById('totalCatTab')
+    const totalFilterShow = document.getElementById('totalFilterShow')
+    
     let editId = null
 
     const savedData = localStorage.getItem('MY_TRANSACTIONS')
@@ -165,11 +182,16 @@
         })
         transactionArea.innerHTML = htmllist.join("")
 
+        const selectedFilterTotal = transactionList.filter(t => t.transactionCategory === totalCatTab.value).reduce((sum, data) => sum + data.transaction, 0)
+        totalFilterShow.innerHTML = `Total berdasarkan ${totalCatTab.value}: Rp.${selectedFilterTotal.toLocaleString()}` 
+
         const totalIncome = transactionList.filter(t => t.transactionType === "income").reduce((sum, data) => sum + data.transaction, 0)
         const totalOutcome = transactionList.filter(t => t.transactionType === "outcome").reduce((sum, data) => sum + data.transaction, 0)
         const availableBudget = totalIncome-totalOutcome
-        cardArea.innerHTML = `<h3>Pemasukan: Rp.${totalIncome.toLocaleString()}</h3><h3>Pengeluaran: Rp.${totalOutcome.toLocaleString()}</h3><h3>Tersedia sekarang: Rp.${availableBudget.toLocaleString()}`
-    }
+        pemasukanShowArea.innerText = `Rp.${totalIncome.toLocaleString()}`
+        pengeluaranShowArea.innerText = `Rp.${totalOutcome.toLocaleString()}`
+        sisaShowArea.innerText = `Rp.${availableBudget.toLocaleString()}`
+        }
 
     const editTransaction = (id) => {
         const target = transactionList.find(item => item.transactionId === id)
@@ -205,6 +227,17 @@
         transactionCatTab.innerHTML = optionsHTML
     }
 
+    const updateTotalCat = () => {
+        const selectedType = totalTypeTab.value
+        const availCategory = categoryMapInput[selectedType]
+
+        const optionsHTML = availCategory.map((cat) => {
+            return `<option value="${cat}">${cat}</option>`
+        }).join("")
+
+        totalCatTab.innerHTML = optionsHTML
+    }
+
     const updateCategory = () => {
         const selectedType = typeSelect.value
         const availCategory = categoryMapInput[selectedType]
@@ -232,6 +265,14 @@
     monthFilter.addEventListener('change', () => {
         render()
     })
+    
+    totalTypeTab.addEventListener('change', () => {
+        render()
+    })
+
+    totalCatTab.addEventListener('change', () => {
+        render()
+    })
 
     resetFilter.addEventListener('click', () => {
         monthFilter.value = ""
@@ -247,7 +288,7 @@
         editId = null
         document.getElementById('transaction').value = ""
         document.getElementById('transactionInfo').value = ""
-        document.getElementById('submitTransaction').innerText = "Simpan Perubahan"
+        document.getElementById('submitTransaction').innerText = "submit"
         document.getElementById('cancelEdit').hidden = true
     })
 
@@ -261,13 +302,14 @@
             if (editId) {
                 transactionList = transactionList.map(item => {
                     if (item.transactionId === editId) {
-                        return { ...item, transactionId: Date.now(), transactionType: transacTypeValue, transactionCategory: transacCategory, transaction: transacValue, transactionInfo: transacInfoValue }
+                        return { ...item, transactionId: item.transactionId, transactionType: transacTypeValue, transactionCategory: transacCategory, transaction: transacValue, transactionInfo: transacInfoValue }
                     }
                     return item
                 })
 
                 editId = null
-                document.getElementById('submitTransaction').innerText = "👌👌"
+                document.getElementById('submitTransaction').innerText = "submit"
+                document.getElementById('cancelEdit').hidden = true
             }
 
             else {
@@ -284,12 +326,13 @@
 
     })
 
-    function deleteTransaction(id) {
+    const deleteTransaction = (id) => {
         transactionList = transactionList.filter(item => item.transactionId !== id)
         render()
     }
     updateCategory()
     updateTranscationCat()
+    updateTotalCat()
     render()
 </script>
 
